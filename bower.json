@@ -1,0 +1,25 @@
+{
+  "name": "corfs",
+  "version": "0.1.0",
+  "authors": [
+    "exos <oscar@gentisoft.com>"
+  ],
+  "description": "FS Class for cordova",
+  "main": "dist/fs.js",
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "fs",
+    "file",
+    "cordova"
+  ],
+  "license": "LGPL2",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
