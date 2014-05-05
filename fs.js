@@ -2,7 +2,7 @@
 (function (root, factory) {
 
     if (typeof define === 'function' && define.amd) {
-        define(['buffer','exports'], function (buffer) {
+        define(['buffer','exports'], function (buffer, exports) {
             return factory(root, exports, buffer);
         });
     } else if (typeof exports !== 'undefined') {
@@ -18,7 +18,10 @@
     var _cofs = root.cofs;
     var Buffer = buffer.Buffer;
 
-    var FileReader = window.FileReader  || throw new Error("Object FileReader does not exists!");
+    var FileReader = window.FileReader  || null;
+   
+    if (!FileReader) 
+        throw new Error("Object FileReader does not exists!");
 
     cofs = function () {
         this.initialize.apply(this, arguments);
