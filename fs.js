@@ -19,9 +19,10 @@
     var Buffer = buffer.Buffer;
 
     var FileReader = window.FileReader  || null;
-   
-    if (!FileReader) 
-        throw new Error("Object FileReader does not exists!");
+    var requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem || null;
+
+    if (!FileReader ||  !requestFileSystem) 
+        throw new Error("Objects of file API does not exists!");
 
     cofs = function () {
         this.initialize.apply(this, arguments);
@@ -44,8 +45,8 @@
 
         options = options || {};
 
-        window.requestFileSystem(
-                LocalFileSystem[options.fs || 'PERSISTENT'],
+        requestFileSystem(
+                window[options.fs || 'PERSISTENT'],
                 0,
                 function (fs) {
                     self._loaded = true;
@@ -82,7 +83,7 @@
         if (typeof this._eventsListeners[eventName] === 'undefined')
             this._eventsListeners[eventName] = [];
 
-        this._eventsListeners[eventName].pull({
+        this._eventsListeners[eventName].push({
             cb: callback,
             once: once || false 
         });
@@ -100,22 +101,38 @@
         var eventName = args.shift();
         var listeners = this._eventsListeners[eventName] || [];
         var i;
-        
-        for (i=0; i<args.length;i++)
-            listeners[i].apply(root, args);
+
+        console.log("emiting " + eventName);
+
+        for (i=0; i<args.length;i++) {
+            if (!listeners[i]) continue;
+            listeners[i].cb.apply(root, args);
+            if (listeners[i].once) {
+                listeners[i] = null;
+            }
+        }
 
         return i;
 
     };
 
-    cofs.prototype.getFileEntry = function (fileName, callback) {
+    cofs.prototype.getFileEntry = function (fileName, options, callback) {
+
+
+        if (typeof options === 'function') {
+            callback = options;
+            options = {};
+        }
         
+        if (typeof fileName === 'object') return callback(null,fileName);
+
         var self = this;
 
         this._ifready(function () {
+            console.log("Getting fileentry for " + fileName);
             self._fs.root.getFile(
                 fileName,
-                null,
+                options,
                 function(fileEntry) {
                     self.emit('fileentry:' + fileName, fileEntry);
                     callback(null, fileEntry);
@@ -132,15 +149,30 @@
        
         var self = this;
 
-        this.getFileEntry(fileName, function (err, fileEntry) {
+        this._ifready(function ()  {
+
+            console.log("Reading", file);
             var reader = new FileReader();
 
-            reader.onloaded = function (evt) {
-                callback(null, new Buffer(evt.target.result));
+            reader.onloadend = function (evt) {
+                var result = this.result;
+                console.log("loaded:", this.result);
+
+                var cresult = result.replace(/^data:[^;]+;base64,/i,'');
+
+                callback(null, new Buffer(cresult, 'base64'));
             };
 
-            reader.readAsDataURL(fileEntry);
-        
+            reader.onerror = function (ev) {
+                callback(new Error('Reading file'));
+            };
+
+            reader.onabort = function (ev) {
+                callback(new Error('Reading abort')); 
+            };
+
+            reader.readAsDataURL(file);
+
         });
 
     };
