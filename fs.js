@@ -158,6 +158,8 @@
                 var result = this.result;
                 console.log("loaded:", this.result);
 
+                if (!result) return callback(new Error('Loaded complete, but nothing returned'));
+
                 var cresult = result.replace(/^data:[^;]*;base64,/i,'');
 
                 callback(null, new Buffer(cresult, 'base64'));
