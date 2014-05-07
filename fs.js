@@ -158,7 +158,7 @@
                 var result = this.result;
                 console.log("loaded:", this.result);
 
-                var cresult = result.replace(/^data:[^;]+;base64,/i,'');
+                var cresult = result.replace(/^data:[^;]*;base64,/i,'');
 
                 callback(null, new Buffer(cresult, 'base64'));
             };
