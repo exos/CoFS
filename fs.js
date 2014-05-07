@@ -158,7 +158,7 @@
                 var result = this.result;
                 console.log("loaded:", this.result);
 
-                if (!result) return callback(new Error('Loaded complete, but nothing returned'));
+                if (!result) return null;
 
                 var cresult = result.replace(/^data:[^;]*;base64,/i,'');
 
