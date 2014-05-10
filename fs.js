@@ -74,6 +74,8 @@
         if (typeof err !== 'object')
             err = new Error(err);
 
+        console.log("CoFS Error" + e.message);
+
         if (!this.emit('error', err))
             throw err; // Throw error if not is listened
     };
