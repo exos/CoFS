@@ -40,32 +40,17 @@
         var self = this;
 
         this._eventsListeners = {}; 
-        this._loaded = false;
         this._fs = null;
 
         options = options || {};
 
-        requestFileSystem(
-                window[options.fs || 'PERSISTENT'],
-                0,
-                function (fs) {
-                    self._loaded = true;
-                    self._fs = fs;
-                    self.emit('ready', fs);
-                },
-                function (err) {
-                    self._loaded = false;
-                    self._error(err); 
-                }
-        );
-        
+        this._options = options;
+
     };
 
-    cofs.prototype._ifready = function (callback) {
-        if (this._loaded) {
-            callback(this._fs);
-        } else {
-            this.once('ready', callback);
+    cofs.prototype._log = function () {
+        if (this._options.logger) {
+            this._options.logger.apply({}, arguments);
         }
     };
 
@@ -118,6 +103,34 @@
 
     };
 
+    cofs.prototype.getFileSystem = function (options, callback) {
+        
+        var self = this;
+
+        if (typeof options == 'function') {
+            callback = options;
+            options = {};
+        }
+        
+        this._log("Open FileSystem", options);
+
+        if (this._fs && !options.force) return callback(null, this._fs);
+
+        requestFileSystem(
+                window[options.fs || 'PERSISTENT'],
+                0,
+                function (fs) {
+                    self._fs = fs;
+                    callback(null, fs);
+                },
+                function (err) {
+                    self._log("Error getting FileSystem", err);
+                    self._error(err); 
+                }
+        );
+
+    };
+
     cofs.prototype.getFileEntry = function (fileName, options, callback) {
 
 
@@ -125,14 +138,18 @@
             callback = options;
             options = {};
         }
-        
+
+        this._log ("Getting FileEntry for", fileName, options);
+
         if (typeof fileName === 'object') return callback(null,fileName);
 
         var self = this;
 
-        this._ifready(function () {
-            console.log("Getting fileentry for " + fileName);
-            self._fs.root.getFile(
+        this.getFileSystem (function (err, fs) {
+
+            if (err) return callback(err);
+
+            fs.root.getFile(
                 fileName,
                 options,
                 function(fileEntry) {
@@ -140,6 +157,7 @@
                     callback(null, fileEntry);
                 },
                 function (err) {
+                    self._log("Error getting FileEntry", err);
                     callback(err);
                 }
             );
@@ -151,37 +169,40 @@
        
         var self = this;
 
-        this._ifready(function ()  {
+        this._log("Reading file for", fileName);
 
-            self.getFileEntry(fileName, function (err, file) {
+        self.getFileEntry(fileName, function (err, file) {
 
-                if (err) return callback(err);
+            if (err) return callback(err);
 
-                console.log("Reading " + fileName);
-                var reader = new FileReader();
+            var reader = new FileReader();
 
-                reader.onloadend = function (evt) {
-                    var result = this.result;
-                    console.log("loaded:", this.result);
+            reader.onloadend = function (evt) {
+                var result = this.result;
+                self._log("load end call! with large (relative): ", result.length );
 
-                    if (!result) return null;
+                if (!result) return null;
 
-                    var cresult = result.replace(/^data:[^;]*;base64,/i,'');
+                var cresult = result.replace(/^data:(?:[^;]*;)?base64,/i,'');
+                self._log(result, cresult);
+                var Buf = new Buffer(cresult, 'base64');
 
-                    callback(null, new Buffer(cresult, 'base64'));
-                };
+                self._log("New large: ", Buf.length);
 
-                reader.onerror = function (ev) {
-                    callback(new Error('Reading file'));
-                };
+                callback(null, Buf);
+            };
 
-                reader.onabort = function (ev) {
-                    callback(new Error('Reading abort')); 
-                };
+            reader.onerror = function (ev) {
+                self._log("Error Reading file", ev);
+                callback(new Error('Reading file'));
+            };
 
-                reader.readAsDataURL(file);
+            reader.onabort = function (ev) {
+                self._log("Reading file Abort!!");
+                callback(new Error('Reading abort')); 
+            };
 
-            });
+            reader.readAsDataURL(file);
 
         });
 
