@@ -147,35 +147,78 @@
 
     };
 
-    cofs.prototype.readFile = function (file, callback) {
+    cofs.prototype.readFile = function (fileName, callback) {
        
         var self = this;
 
         this._ifready(function ()  {
 
-            console.log("Reading", file);
-            var reader = new FileReader();
+            self.getFileEntry(fileName, function (err, file) {
 
-            reader.onloadend = function (evt) {
-                var result = this.result;
-                console.log("loaded:", this.result);
+                if (err) return callback(err);
 
-                if (!result) return null;
+                console.log("Reading " + fileName);
+                var reader = new FileReader();
 
-                var cresult = result.replace(/^data:[^;]*;base64,/i,'');
+                reader.onloadend = function (evt) {
+                    var result = this.result;
+                    console.log("loaded:", this.result);
 
-                callback(null, new Buffer(cresult, 'base64'));
-            };
+                    if (!result) return null;
 
-            reader.onerror = function (ev) {
-                callback(new Error('Reading file'));
-            };
+                    var cresult = result.replace(/^data:[^;]*;base64,/i,'');
 
-            reader.onabort = function (ev) {
-                callback(new Error('Reading abort')); 
-            };
+                    callback(null, new Buffer(cresult, 'base64'));
+                };
 
-            reader.readAsDataURL(file);
+                reader.onerror = function (ev) {
+                    callback(new Error('Reading file'));
+                };
+
+                reader.onabort = function (ev) {
+                    callback(new Error('Reading abort')); 
+                };
+
+                reader.readAsDataURL(file);
+
+            });
+
+        });
+
+    };
+
+    cofs.prototype.writeFile = function (fileName, data, callback) {
+    
+        var self = this;
+
+        if (Buffer.isBuffer(data)) {
+            data = data.toString('binary'); 
+        }
+
+        this._ifready(function () {
+
+            self.getFileEntry(fileName, {create: true, exclusive: true}, function (err, fileEntry) {
+
+                if (err) return callback(new Error("Error getting file access " + err.message));
+
+                fileEntry.createWriter(function(fileWriter) {
+               
+                    fileWriter.onwriteend = function () {
+                        callback(null);
+                    };
+
+                    fileWriter.onerror = function(e) {
+                        callback(new Error(e.toString()));
+                    };
+
+                    var blob = new Blob([data], {type: 'application/octet-stream'});
+
+                    fileWriter.write(blob);
+
+                }, function () {
+                    callback(new Error('Error writing ' + fileName));
+                }); 
+            });
 
         });
 
