@@ -114,7 +114,7 @@
         
         this._log("Open FileSystem", options);
 
-        if (this._fs && !options.force) return callback(null, this._fs);
+        //if (this._fs && !options.force) return callback(null, this._fs);
 
         requestFileSystem(
                 window[options.fs || 'PERSISTENT'],
