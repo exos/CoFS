@@ -59,7 +59,7 @@
         if (typeof err !== 'object')
             err = new Error(err);
 
-        console.log("CoFS Error" + e.message);
+        this._log("CoFS Error" + e.message);
 
         if (!this.emit('error', err))
             throw err; // Throw error if not is listened
@@ -89,7 +89,7 @@
         var listeners = this._eventsListeners[eventName] || [];
         var i;
 
-        console.log("emiting " + eventName);
+        this._log("emiting " + eventName);
 
         for (i=0; i<args.length;i++) {
             if (!listeners[i]) continue;
@@ -171,38 +171,48 @@
 
         this._log("Reading file for", fileName);
 
-        self.getFileEntry(fileName, function (err, file) {
+        self.getFileEntry(fileName, function (err, fileEntry) {
 
-            if (err) return callback(err);
+            if (err) {
+                self._log("Error getting FileEntry:", err);
+                return callback(err);
+            }
 
-            var reader = new FileReader();
+            fileEntry.file(function (file) {
 
-            reader.onloadend = function (evt) {
-                var result = this.result;
-                self._log("load end call! with large (relative): ", result.length );
+                self._log("Creating filereader object", file);
+                var reader = new FileReader();
 
-                if (!result) return null;
+                reader.onloadend = function (evt) {
+                    self._log("reading end", evt);
+                    var result = this.result;
+                    self._log("load end call! with large (relative): ", result.length );
 
-                var cresult = result.replace(/^data:(?:[^;]*;)?base64,/i,'');
-                self._log(result, cresult);
-                var Buf = new Buffer(cresult, 'base64');
+                    if (!result) return null;
 
-                self._log("New large: ", Buf.length);
+                    var cresult = result.replace(/^data:(?:[^;]*;)?base64,/i,'');
+                    self._log(result, cresult);
+                    var Buf = new Buffer(cresult, 'base64');
 
-                callback(null, Buf);
-            };
+                    self._log("New large: ", Buf.length);
 
-            reader.onerror = function (ev) {
-                self._log("Error Reading file", ev);
-                callback(new Error('Reading file'));
-            };
+                    callback(null, Buf);
+                };
 
-            reader.onabort = function (ev) {
-                self._log("Reading file Abort!!");
-                callback(new Error('Reading abort')); 
-            };
+                reader.onerror = function (ev) {
+                    self._log("Error Reading file", ev);
+                    callback(new Error('Reading file'));
+                };
 
-            reader.readAsDataURL(file);
+                reader.onabort = function (ev) {
+                    self._log("Reading file Abort!!");
+                    callback(new Error('Reading abort')); 
+                };
+
+                self._log("read as url!");
+                reader.readAsDataURL(file);
+
+            });
 
         });
 
