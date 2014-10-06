@@ -13,16 +13,13 @@
     }
 
 })(this, function (root, cofs, buffer) {
-    "use stricts";
+    'use stricts';
 
     var _cofs = root.cofs;
     var Buffer = buffer.Buffer;
 
-    var FileReader = window.FileReader  || null;
-    var requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem || null;
-
-    if (!FileReader ||  !requestFileSystem) 
-        throw new Error("Objects of file API does not exists!");
+    var FileReader = null;
+    var requestFileSystem = null;
 
     cofs = function () {
         this.initialize.apply(this, arguments);
@@ -38,6 +35,12 @@
     cofs.prototype.initialize = function (options) {
  
         var self = this;
+
+        if (!FileReader) FileReader = window.FileReader  || null;
+        if (!requestFileSystem) requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem || null;
+
+        if (!FileReader ||  !requestFileSystem) 
+            throw new Error("Objects of file API does not exists!");
 
         this._eventsListeners = {}; 
         this._fs = null;
