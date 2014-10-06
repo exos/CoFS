@@ -9,30 +9,30 @@
         var buffer = require('buffer');
         factory(root, exports, buffer);
     } else {
-        root.cofs = factory(root, {}, root.buffer);
+        root.CoFS = factory(root, {}, root.buffer);
     }
 
-})(this, function (root, cofs, buffer) {
+})(this, function (root, CoFS, buffer) {
     'use stricts';
 
-    var _cofs = root.cofs;
+    var _CoFS = root.CoFS;
     var Buffer = buffer.Buffer;
 
     var FileReader = null;
     var requestFileSystem = null;
 
-    cofs = function () {
+    CoFS = function () {
         this.initialize.apply(this, arguments);
     };
 
-    cofs.VERSION = '0.1.0';
+    CoFS.VERSION = '0.1.0';
 
-    cofs.noConflict = function () {
-        root.cofs = _cofs;
+    CoFS.noConflict = function () {
+        root.CoFS = _CoFS;
         return this;
     };
 
-    cofs.prototype.initialize = function (options) {
+    CoFS.prototype.initialize = function (options) {
  
         var self = this;
 
@@ -51,13 +51,13 @@
 
     };
 
-    cofs.prototype._log = function () {
+    CoFS.prototype._log = function () {
         if (this._options.logger) {
             this._options.logger.apply({}, arguments);
         }
     };
 
-    cofs.prototype._error = function (err) {
+    CoFS.prototype._error = function (err) {
 
         if (typeof err !== 'object')
             err = new Error(err);
@@ -68,7 +68,7 @@
             throw err; // Throw error if not is listened
     };
 
-    cofs.prototype.on = function (eventName, callback, once) {
+    CoFS.prototype.on = function (eventName, callback, once) {
 
         if (typeof this._eventsListeners[eventName] === 'undefined')
             this._eventsListeners[eventName] = [];
@@ -80,11 +80,11 @@
 
     };
 
-    cofs.prototype.once = function (eventName, callback) {
+    CoFS.prototype.once = function (eventName, callback) {
         return this.on(eventName, callback, true); 
     };
 
-    cofs.prototype.emit = function () {
+    CoFS.prototype.emit = function () {
         if (!arguments.length) return false;
 
         var args = Array.prototype.slice.call(arguments, 0);
@@ -106,7 +106,7 @@
 
     };
 
-    cofs.prototype.getFileSystem = function (options, callback) {
+    CoFS.prototype.getFileSystem = function (options, callback) {
         
         var self = this;
 
@@ -134,7 +134,7 @@
 
     };
 
-    cofs.prototype.getFileEntry = function (fileName, options, callback) {
+    CoFS.prototype.getFileEntry = function (fileName, options, callback) {
 
 
         if (typeof options === 'function') {
@@ -168,7 +168,7 @@
 
     };
 
-    cofs.prototype.readFile = function (fileName, callback) {
+    CoFS.prototype.readFile = function (fileName, callback) {
        
         var self = this;
 
@@ -221,7 +221,7 @@
 
     };
 
-    cofs.prototype.writeFile = function (fileName, data, callback) {
+    CoFS.prototype.writeFile = function (fileName, data, callback) {
     
         var self = this;
 
@@ -258,6 +258,6 @@
 
     };
 
-    return cofs;
+    return CoFS;
 
 });

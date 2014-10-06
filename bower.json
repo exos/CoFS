@@ -1,5 +1,5 @@
 {
-  "name": "corfs",
+  "name": "CoFS",
   "version": "0.2.0",
   "authors": [
     "exos <oscar@gentisoft.com>"
@@ -12,7 +12,9 @@
   "keywords": [
     "fs",
     "file",
-    "cordova"
+    "cordova",
+    "phonegap",
+    "HTML 5 File"
   ],
   "license": "LGPL2",
   "ignore": [
