@@ -1,0 +1,37 @@
+{
+  "name": "CoFS",
+  "version": "0.2.1",
+  "description": "Manage the HTML5 Native File API *like a Sir*.",
+  "author": "exos <oscar@gentisoft.com>",
+  "authors": [
+    "exos <oscar@gentisoft.com>"
+  ],
+
+  "main": "dist/fs.js",
+  "scripts": {
+    "test": "grunt check"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/exos/cofs"
+  },
+  "keywords": [
+    "files",
+    "HTML5 File API",
+    "fs",
+    "cordova",
+    "phonegap"
+  ],
+  "license": "GPL2",
+  "bugs": {
+    "url": "https://github.com/exos/cofs/issues"
+  },
+  "homepage": "https://github.com/exos/cofs",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-contrib-jshint": "^0.10.0",
+    "grunt-contrib-uglify": "^0.6.0",
+    "grunt-update-json": "^0.1.3"
+  }
+}
