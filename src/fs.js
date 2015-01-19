@@ -268,7 +268,9 @@
             data = new Buffer(data, encoding);
         }
 
-        this._ifready(function () {
+        this.getFileSystem(function (err, fs) {
+
+            if (err) return callback(err);
 
             var op = {
                 create: true,
