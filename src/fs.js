@@ -133,14 +133,49 @@
         );
 
     };
+    
+    CoFS.prototype.getDirectory = function (dirName, options, cb) {
+        var self = this;
+
+        if (typeof options === 'function') {
+            cb = options;
+            options = undefined;
+        }
+
+        var op = false;
+
+        var gOptions = _.extends({
+        }, options || {});
+
+        this.getFileSystem(function (err, fs) {
+            fs.root.getDirectory(
+                dirName,
+                gOptions,
+                function (dirEntry) {
+                    if (op) return;
+                    op = true;
+                    return cb(undefined, dirEntry);
+                },
+                function (err) {
+                    if (op) return;
+                    op = true;
+                    self._log("Error getting directory entry", err);
+                    self._error(err);
+                    return cb(new Error(err));
+                }
+            ); 
+        });
+
+    };
 
     CoFS.prototype.getFileEntry = function (fileName, options, callback) {
-
 
         if (typeof options === 'function') {
             callback = options;
             options = {};
         }
+
+        var root = options.root || undefined;
 
         this._log ("Getting FileEntry for", fileName, options);
 
@@ -152,7 +187,10 @@
 
             if (err) return callback(err);
 
-            fs.root.getFile(
+            if (typeof root === 'undefined')
+                root = fs.root;
+
+            root.getFile(
                 fileName,
                 options,
                 function(fileEntry) {
@@ -221,19 +259,29 @@
 
     };
 
-    CoFS.prototype.writeFile = function (fileName, data, callback) {
+    CoFS.prototype.writeFile = function (fileName, data, encoding, callback) {
     
         var self = this;
 
         if (Buffer.isBuffer(data)) {
-            data = data.toString('binary'); 
+            callback = encoding;
+            encoding = undefined;
+        } else {
+            data = new Buffer(data, encoding);
         }
 
         this._ifready(function () {
 
-            self.getFileEntry(fileName, {create: true, exclusive: true}, function (err, fileEntry) {
+            var op = {
+                create: true,
+                exclusive: true
+            };
 
-                if (err) return callback(new Error("Error getting file access " + err.message));
+            self.getFileEntry(fileName, op, function (err, fileEntry) {
+
+                if (err)
+                    return callback(
+                        new Error("Error getting file access " + err.message));
 
                 fileEntry.createWriter(function(fileWriter) {
                
@@ -245,7 +293,12 @@
                         callback(new Error(e.toString()));
                     };
 
-                    var blob = new Blob([data], {type: 'application/octet-stream'});
+                    var blob = new Blob(
+                        [data.toString('binary')],
+                        {
+                            type: 'application/octet-stream'
+                        }
+                    );
 
                     fileWriter.write(blob);
 
