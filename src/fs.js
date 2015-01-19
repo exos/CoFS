@@ -143,14 +143,12 @@
         }
 
         var op = false;
-
-        var gOptions = _.extends({
-        }, options || {});
+        options = options || {};
 
         this.getFileSystem(function (err, fs) {
             fs.root.getDirectory(
                 dirName,
-                gOptions,
+                options,
                 function (dirEntry) {
                     if (op) return;
                     op = true;
