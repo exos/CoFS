@@ -294,9 +294,10 @@
                     };
 
                     var blob = new Blob(
-                        [data.toString('binary')],
+                        [data.toString('base64')],
                         {
-                            type: 'application/octet-stream'
+                            type: 'application/octet-stream',
+                            encoding: 'base64'
                         }
                     );
 
