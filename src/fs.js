@@ -21,6 +21,31 @@
     var FileReader = null;
     var requestFileSystem = null;
 
+    var arrayBufferToBuffer = function (arr) {
+        var i,x,c, b, d;
+
+        d = new Int8Array(arr);
+        b = new Buffer(d);
+        c = arr.byteLength;
+
+        if (b.length || !c) {
+            d = null;
+            return b;
+        } else {
+
+            b = new Buffer(c);
+
+            for (i = 0; i < c; i++) {
+                x = d[i];
+                b.writeUInt8(x, i);
+            }
+
+            d = null;
+            return b;
+        }
+
+    };
+
     CoFS = function () {
         this.initialize.apply(this, arguments);
     };
@@ -223,17 +248,11 @@
                 var reader = new FileReader();
 
                 reader.onloadend = function (evt) {
-                    self._log("reading end", evt);
-                    var result = this.result;
-                    self._log("load end call! with large (relative): ", result.length );
+                    self._log("load end call! with large (relative): ", this.result.length );
 
-                    if (!result) return null;
+                    if (!this.result) return null;
 
-                    var cresult = result.replace(/^data:(?:[^;]*;)?base64,/i,'');
-                    self._log(result, cresult);
-                    var Buf = new Buffer(cresult, 'base64');
-
-                    self._log("New large: ", Buf.length);
+                    var Buf  = arrayBufferToBuffer(this.result);
 
                     callback(null, Buf);
                 };
@@ -249,7 +268,7 @@
                 };
 
                 self._log("read as url!");
-                reader.readAsDataURL(file);
+                reader.readAsArrayBuffer(file);
 
             });
 
