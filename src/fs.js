@@ -87,7 +87,7 @@
         if (typeof err !== 'object')
             err = new Error(err);
 
-        this._log("CoFS Error" + e.message);
+        this._log("CoFS Error" + err.message);
 
         if (!this.emit('error', err))
             throw err; // Throw error if not is listened
@@ -229,50 +229,64 @@
 
     };
 
-    CoFS.prototype.readFile = function (fileName, callback) {
-       
+    CoFS.prototype.readFromFileObject = function (file, callback) {
         var self = this;
 
-        this._log("Reading file for", fileName);
+        this._log("Creating filereader object", file);
+        var reader = new FileReader();
 
-        self.getFileEntry(fileName, function (err, fileEntry) {
+        reader.onloadend = function (evt) {
+            self._log("load end call! with large (relative): ", this.result.length );
 
-            if (err) {
-                self._log("Error getting FileEntry:", err);
-                return callback(err);
-            }
+            if (!this.result) return null;
 
-            fileEntry.file(function (file) {
+            var Buf  = arrayBufferToBuffer(this.result);
 
-                self._log("Creating filereader object", file);
-                var reader = new FileReader();
+            callback(null, Buf);
+        };
 
-                reader.onloadend = function (evt) {
-                    self._log("load end call! with large (relative): ", this.result.length );
+        reader.onerror = function (ev) {
+            self._log("Error Reading file", ev);
+            callback(new Error('Reading file'));
+        };
 
-                    if (!this.result) return null;
+        reader.onabort = function (ev) {
+            self._log("Reading file Abort!!");
+            callback(new Error('Reading abort')); 
+        };
 
-                    var Buf  = arrayBufferToBuffer(this.result);
+        reader.readAsArrayBuffer(file);
 
-                    callback(null, Buf);
-                };
+    };
 
-                reader.onerror = function (ev) {
-                    self._log("Error Reading file", ev);
-                    callback(new Error('Reading file'));
-                };
+    CoFS.prototype.readFromFileEntry = function (fileEntry, callback) {
+        var self = this;
 
-                reader.onabort = function (ev) {
-                    self._log("Reading file Abort!!");
-                    callback(new Error('Reading abort')); 
-                };
+        fileEntry.file(function (file) {
+            self.readFromFileObject(file, callback);
+        });
 
-                self._log("read as url!");
-                reader.readAsArrayBuffer(file);
+    };
+
+    CoFS.prototype.readFile = function (fileName, callback) {
+        var self = this;
+
+        if (fileName instanceof File) {
+            return this.readFromFileObject(fileName, callback);
+        } else if (fileName instanceof FileEntry) {
+            return this.readFromFileEntry(fileName, callback);
+        } else if (typeof fileName === 'string') {
+            this.getFileEntry(fileName, function (err, fileEntry) {
+                if (err)
+                    return callback(err);
+
+                self.readFromFileEntry(fileEntry, callback);
 
             });
-
-        });
+        } else {
+            return callback(
+                    new Error("First arguments need to be a file or filepath"));
+        }
 
     };
 

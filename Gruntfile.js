@@ -29,7 +29,7 @@ module.exports = function(grunt) {
         clean: {
             build: ['dist/*']
         },
-        uglify: {
+/*        uglify: {
             options: {
                 banner: '<%= meta.banner  %>', 
                 compress: true
@@ -41,20 +41,43 @@ module.exports = function(grunt) {
             }
             
         },
+        */
         jshint: {
             files: [
                 'Gruntfile.js',
                 'src/*.js'
             ]
-        }    
+        },    
+        requirejs: {
+            compile: {
+                options: {
+                    paths: {
+                        cofs: 'src',
+                        buffer: 'bower_components/buffer/buffer',
+                        async: 'bower_components/async/lib/async',
+                        underscore: 'bower_components/underscore/underscore'
+                    },
+                    //mainConfigFile: "src/lib/requirejs-config.js",
+                    //include: ['main'],
+                    name: 'cofs/fs',
+                    //          optimize: "uglify",
+                    //          preserveLicenseComments: false,
+                    //name: "path/to/almond", // assumes a production build using almond
+                    out: "dist/<%= pkg.name %>.js",
+                    optimize: 'none',
+                    wrap: true
+                }
+            }
+        }
     });
 
-    grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-update-json');
+    grunt.loadNpmTasks('grunt-contrib-requirejs');
 
-    grunt.registerTask('default', ['jshint','clean','uglify', 'update_json']);
+    grunt.registerTask('build', ['clean', 'update_json', 'requirejs']);
     grunt.registerTask('check', ['jshint']);
+    grunt.registerTask('default', ['jshint', 'update_json', 'build']);
 
 };
