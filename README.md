@@ -24,10 +24,10 @@ Manage the HTML 5 File API *like a Sir*.
 ```JavaScript
 var fs = new CoFS();
 
-fs.readFile($('input[type="file"]').file, function (err, data) {
+fs.readFile($('input[type="file"]').files[0], function (err, data) {
 
     if (err) {
-        // Display, ignore, kill, love, etc
+        // Display, ignore, kills, love, etc
     }
 
     console.log("Data of file:" + data.toString('utf-8'));
