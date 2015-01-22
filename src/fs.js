@@ -2,7 +2,7 @@
 (function (root, factory) {
 
     if (typeof define === 'function' && define.amd) {
-        define(['buffer', 'async', 'exports'], function (buffer, exports) {
+        define(['buffer', 'async', 'exports'], function (buffer, async, exports) {
             return factory(root, exports, async, buffer);
         });
     } else if (typeof exports !== 'undefined') {
@@ -204,7 +204,7 @@
                     op = true;
                     self._log("Error getting directory entry", err);
                     self._error(err);
-                    return cb(new Error(err));
+                    return cb(err);
                 }
             ); 
         });
