@@ -293,8 +293,6 @@
 
         if (fileName instanceof File || fileName instanceof Blob) {
             return this.readFromFileObject(fileName, callback);
-        } else if (fileName instanceof FileEntry) {
-            return this.readFromFileEntry(fileName, callback);
         } else {
             this.getFileEntry(fileName, function (err, fileEntry) {
                 if (err)
@@ -394,10 +392,6 @@
         var getFile = function (cb) {
             if (file instanceof File || file instanceof Blob) {
                 return cb(undefined, file);
-            } else if (file instanceof FileEntry) {
-                file.file(function (file) {
-                    return cb(undefined, file);
-                });
             } else {
                 self.getFileEntry(file, function (err, fileEntry) {
                     
