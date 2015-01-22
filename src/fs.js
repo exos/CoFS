@@ -295,7 +295,7 @@
             return this.readFromFileObject(fileName, callback);
         } else if (fileName instanceof FileEntry) {
             return this.readFromFileEntry(fileName, callback);
-        } else if (typeof fileName === 'string') {
+        } else {
             this.getFileEntry(fileName, function (err, fileEntry) {
                 if (err)
                     return callback(err);
@@ -303,9 +303,6 @@
                 self.readFromFileEntry(fileEntry, callback);
 
             });
-        } else {
-            return callback(
-                    new Error("First arguments need to be a file or filepath"));
         }
 
     };
