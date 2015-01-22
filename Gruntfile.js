@@ -29,20 +29,27 @@ module.exports = function(grunt) {
         clean: {
             build: ['dist/*']
         },
-/*        uglify: {
-            options: {
-                banner: '<%= meta.banner  %>', 
-                compress: true
-            },
-            fs: {
-                files: {
-                    'dist/fs.min.js': ['src/fs.js']
-                }
-            }
-            
-        },
-        */
         jshint: {
+            options: {
+                reporter: require('jshint-stylish'), 
+                curly: false,
+                eqeqeq: true,
+                immed: true,
+                latedef: true,
+                newcap: true,
+                noarg: true,
+                sub: true,
+                undef: true,
+                boss: true,
+                devel: true,
+                eqnull: true,
+                browser: true,
+                globals: {
+                  define: true,
+                  require: true,
+                  exports: true
+                }
+            },
             files: [
                 'Gruntfile.js',
                 'src/*.js'
@@ -57,14 +64,10 @@ module.exports = function(grunt) {
                         async: 'bower_components/async/lib/async',
                         underscore: 'bower_components/underscore/underscore'
                     },
-                    //mainConfigFile: "src/lib/requirejs-config.js",
-                    //include: ['main'],
                     name: 'cofs/fs',
-                    //          optimize: "uglify",
-                    //          preserveLicenseComments: false,
-                    //name: "path/to/almond", // assumes a production build using almond
                     out: "dist/<%= pkg.name %>.js",
                     optimize: 'none',
+                    //optimize: "uglify",
                     wrap: true
                 }
             }
