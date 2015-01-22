@@ -1,0 +1,70 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <style>
+            #result {
+                font-family: monospace;
+                border: 1px solid black;
+                padding: 10px;
+            }
+
+            .block {
+                border: 1px solid blue;
+                margin: 3px;
+                padding: 2px;
+            }
+
+        </style>
+    </head>
+    <body>
+        <label for="filsel">File:</label>
+        <input type="file" id="ifile">
+        <hr>
+        <div id="result"></div>
+        <hr>
+        <input type="button" id="cmd-read" value="read">
+        <script type="text/javascript" src="../dist/CoFS.js"></script>
+        <script type="text/javascript">
+
+            var $file = document.getElementById('ifile');
+            var $cmdRead = document.getElementById('cmd-read');
+            var $result = document.getElementById('result');
+
+            var fs = new CoFS();
+
+            $cmdRead.onclick = function (ev) {
+                var files = $file.files;
+
+                if (!files || !files.length) {
+                    return alert("No file selected");
+                }
+
+                var stream = fs.createReadStream(files[0]);
+
+                stream.error = function (err) {
+                    alert("Error: " + err);
+                };
+
+                stream.partComplete = function (data, done) {
+                    var div = document.createElement('div');
+                    div.className = 'block';
+                    div.innerHTML = data.toString('hex').match(/.{1,2}/g).join(' ');
+                    $result.appendChild(div);
+  /*                  setTimeout(function () {
+                        done();       
+                    }, 1000);
+*/
+//                    return done;
+                };
+
+                stream.readComplete = function (){
+                    alert ("Raad complete!");
+                };
+
+                stream.start();
+
+            };
+
+        </script>
+    </body>
+</html>
