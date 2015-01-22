@@ -2,17 +2,18 @@
 (function (root, factory) {
 
     if (typeof define === 'function' && define.amd) {
-        define(['buffer','exports'], function (buffer, exports) {
-            return factory(root, exports, buffer);
+        define(['buffer', 'async', 'exports'], function (buffer, exports) {
+            return factory(root, exports, async, buffer);
         });
     } else if (typeof exports !== 'undefined') {
         var buffer = require('buffer');
-        factory(root, exports, buffer);
+        var async = require('async');
+        factory(root, exports, async, buffer);
     } else {
-        root.CoFS = factory(root, {}, root.buffer);
+        root.CoFS = factory(root, {}, root.async, root.buffer);
     }
 
-})(this, function (root, CoFS, buffer) {
+})(this, function (root, CoFS, async, buffer) {
     'use stricts';
 
     var _CoFS = root.CoFS;
@@ -48,6 +49,19 @@
 
     };
 
+    var getDonePromise = function (listener) {
+
+        if (typeof listener !== 'function') {
+            throw new Error("Listener not defined");
+        }
+
+        return function () {
+            var args = Array.prototype.slice.call(arguments);
+            listener.apply({}, args);
+        };
+
+    };
+
     CoFS = function () {
         this.initialize.apply(this, arguments);
     };
@@ -66,9 +80,8 @@
         if (!FileReader) FileReader = window.FileReader  || null;
         if (!requestFileSystem) requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem || null;
         if (!File) File = window.File || null;
-        if (!FileEntry)  FileEntry = window.FileEntry || null;
 
-        if (!FileReader ||  !requestFileSystem || !File || !FileEntry) 
+        if (!FileReader ||  !requestFileSystem || !File) 
             throw new Error("Objects of file API does not exists!");
 
         this._eventsListeners = {}; 
@@ -95,6 +108,9 @@
 
         if (!this.emit('error', err))
             throw err; // Throw error if not is listened
+
+        return err;
+
     };
 
     CoFS.prototype.on = function (eventName, callback, once) {
@@ -275,7 +291,7 @@
     CoFS.prototype.readFile = function (fileName, callback) {
         var self = this;
 
-        if (fileName instanceof File) {
+        if (fileName instanceof File || fileName instanceof Blob) {
             return this.readFromFileObject(fileName, callback);
         } else if (fileName instanceof FileEntry) {
             return this.readFromFileEntry(fileName, callback);
@@ -345,6 +361,132 @@
             });
 
         });
+
+    };
+
+    CoFS.prototype.readFilePart = function (file, start, end, cb) {
+
+        // For compatibility
+        if (typeof file.slice !== 'function') {
+            if (file.mozSlice === 'function') {
+                file.slice = file.mozSlice;
+            } else if (file.webkitSlice === 'function') {
+                file.slice = file.webkitSlice;
+            } else {
+                var err = this._error("File has not slice method");
+                return cb(err); 
+            }
+        }
+
+        return this.readFromFileObject(file.slice(start, end), cb);
+
+    };
+
+    CoFS.prototype.createReadStream = function (file, options) {
+        var self = this;
+
+        options = options || {};
+        var blockSize = options.blockSize || 4096;
+        var start = options.start || 0;
+        var end = options.end !== undefined ? options.end : undefined;
+   
+        if (end <= start) {
+            throw new Error("Start byte has been bigger that end  byte");
+        }
+
+        var getFile = function (cb) {
+            if (file instanceof File || file instanceof Blob) {
+                return cb(undefined, file);
+            } else if (file instanceof FileEntry) {
+                file.file(function (file) {
+                    return cb(undefined, file);
+                });
+            } else {
+                self.getFileEntry(file, function (err, fileEntry) {
+                    
+                    if (err) return cb(err);
+
+                    fileEntry.file(function (file) {
+                        return cb(undefined, file);
+                    });
+                });
+            }
+        };
+
+        var startStream = function (file, interface) {
+        
+            var parts = [];
+
+            if (typeof end === 'undefined')
+                end = file.size;
+
+            for (var i = start; i < end; i += blockSize) {
+
+                parts.push({
+                    start: i, 
+                    end: i+blockSize
+                });
+            }
+
+            async.eachSeries(
+                parts,
+                function (part, tcb) {
+
+                    var done = getDonePromise(function (err) {
+                        tcb(err || undefined);
+                    }); 
+
+                    self.readFilePart(
+                        file,
+                        part.start,
+                        part.end,
+                        function (err, data) {
+
+                            if (err) {
+                                done(err);
+                                return;
+                            }
+
+                            var cr = interface.partComplete(data, done);
+
+                            if (cr !== done)
+                                done();
+
+                        }
+                    );
+
+                }, function (err) {
+                    if (err) {
+                        return interface.error(err);
+                    }
+                    interface.readComplete();
+                }
+            );
+
+        };
+
+        var controlInterface = {
+            partComplete: function () {},
+            readComplete: function () {},
+            error: function (e) {
+                throw e;
+            },
+            start: function () {
+
+                var me = this;
+
+                getFile(function (err, file) {
+                    if (err) {
+                        return me.error(err);
+                    }
+
+                    startStream(file, me);
+
+                });
+            }
+        };
+
+        return controlInterface;
 
     };
 
