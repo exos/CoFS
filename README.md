@@ -14,6 +14,7 @@ Manage the HTML 5 File API *like a Sir*.
 ## Dependencies
 
 * **Buffer**: http://github.com/anodynos/node2web_buffer
+* **Async.js**: https://github.com/caolan/async
 
 ## Instalation
 
