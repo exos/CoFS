@@ -20,6 +20,8 @@
 
     var FileReader = null;
     var requestFileSystem = null;
+    var File = null;
+    var FileEntry = null;
 
     var arrayBufferToBuffer = function (arr) {
         var i,x,c, b, d;
@@ -63,8 +65,10 @@
 
         if (!FileReader) FileReader = window.FileReader  || null;
         if (!requestFileSystem) requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem || null;
+        if (!File) File = window.File || null;
+        if (!FileEntry)  FileEntry = window.FileEntry || null;
 
-        if (!FileReader ||  !requestFileSystem) 
+        if (!FileReader ||  !requestFileSystem || !File || !FileEntry) 
             throw new Error("Objects of file API does not exists!");
 
         this._eventsListeners = {}; 
@@ -135,7 +139,7 @@
         
         var self = this;
 
-        if (typeof options == 'function') {
+        if (typeof options === 'function') {
             callback = options;
             options = {};
         }
