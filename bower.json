@@ -5,7 +5,7 @@
 		"exos <oscar@gentisoft.com>"
 	],
 	"description": "Manage the HTML5 Native File API *like a Sir*.",
-	"main": "dist/fs.js",
+	"main": "dist/CoFS.min",
 	"moduleType": [
 		"amd"
 	],
@@ -19,6 +19,14 @@
 	"license": "GPL2",
 	"ignore": [
 		"**/.*",
+        ".git",
+        ".gitignore",
+        ".jshintr",
+        "package.json",
+        "bower.json",
+        "GruntFile.js",
+        "examples/*",
+        "extras",
 		"node_modules",
 		"bower_components",
 		"test",
