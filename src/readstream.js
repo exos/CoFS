@@ -92,6 +92,8 @@ define([
                 return self._error(err);
             }
 
+            self.emit('debug', 'Starting strean for ' + file.fullPath);
+
             if (typeof end === 'undefined')
                 end = file.size;
 
@@ -104,6 +106,7 @@ define([
                 function (tcb) {
 
                     var done = function (data) {
+                        self.emit('debug', 'Sending data block');
                         self.emit('data', data);
                         return tcb(); 
                     };
@@ -122,10 +125,14 @@ define([
                             }
 
                             if (self._paused) {
+                                self.emit('debug', 'Is paused, wating resume' +
+                                                        ' event to send data');
                                 return self.once('resume', function () {
+                                    self.emit('resumed, sending data');
                                     done(data);
                                 }); 
                             } else if (self._stoped) {
+                                self.emit('Is stoped, throwing');
                                 return tcb(new StopedErr());
                             } else {
                                 done(data);
@@ -142,7 +149,17 @@ define([
                     if (err) {
                         return self._error(err);
                     } else {
-                        return self.emit('finish');
+                        self.emit('Finished');
+                        if (!self._paused) {
+                            self.emit('Sending finish');
+                            return self.emit('finish');
+                        } else {
+                            self.emit('Are finished but is paused, waiting.');
+                            self.once('resume', function () {
+                                self.emit('debug', 'resumed, sending finish');
+                                return self.emit('finish'); 
+                            });
+                        }
                     }
                 }
             );

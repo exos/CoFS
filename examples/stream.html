@@ -51,6 +51,10 @@
 
                 var stream = fs.createReadStream(files[0]);
 
+                stream.on('debug', function (log) {
+                    console.log(log);     
+                });
+
                 stream.on('error', function (err) {
                     alert ("Error!! " + err)
                 });
@@ -75,6 +79,11 @@
                 }
 
                 var stream = fs.createReadStream(files[0]);
+
+                stream.on('debug', function (log) {
+                    console.log(log);     
+                });
+
 
                 stream.on('error', function (err) {
                     alert ("Error!! " + err)

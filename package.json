@@ -1,6 +1,6 @@
 {
   "name": "CoFS",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Manage the HTML5 Native File API *like a Sir*.",
   "author": "exos <oscar@gentisoft.com>",
   "authors": [
