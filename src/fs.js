@@ -17,7 +17,7 @@ define([
         this.initialize.apply(this, arguments);
     };
 
-    CoFS.VERSION = '0.1.0';
+    CoFS.VERSION = '0.4.2';
 
     CoFS.prototype.initialize = function (options) {
  
