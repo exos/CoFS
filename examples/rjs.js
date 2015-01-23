@@ -5,7 +5,7 @@ requirejs.config({
         cofs: 'src',
         buffer: 'bower_components/buffer/buffer',
         async: 'bower_components/async/lib/async',
-        "events-emitter": 'bower_components/events-emitter/src'
+        eventemitter2: 'bower_components/eventemitter2/lib/eventemitter2'
     }
 });
 

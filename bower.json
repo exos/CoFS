@@ -27,6 +27,6 @@
 	"dependencies": {
 		"buffer": "~3.24.10",
 		"async": "~0.9.2",
-		"events-emitter": "~1.0.1"
+		"eventemitter2": "~0.4.14"
 	}
 }

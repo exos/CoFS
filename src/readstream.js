@@ -1,6 +1,6 @@
 define([
     'async',
-    'events-emitter/EventsEmitter'
+    'eventemitter2'
 ], function (async, EventsEmitter) {
     'use stricts';
 
