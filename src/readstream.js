@@ -103,6 +103,11 @@ define([
                 },
                 function (tcb) {
 
+                    var done = function (data) {
+                        self.emit('data', data);
+                        return tcb(); 
+                    };
+
                     self._fs.readFilePart(
                         file,
                         byByte,
@@ -118,16 +123,14 @@ define([
 
                             if (self._paused) {
                                 return self.once('resume', function () {
-                                    tcb();
+                                    done(data);
                                 }); 
-                            }
-
-                            if (self._stoped) {
+                            } else if (self._stoped) {
                                 return tcb(new StopedErr());
+                            } else {
+                                done(data);
                             }
 
-                            self.emit('data', data);
-                            tcb();
                         }
                     );
 
