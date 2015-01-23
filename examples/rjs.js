@@ -2,14 +2,14 @@
 requirejs.config({
     baseUrl: '../',
     paths: {
-        cofs: 'src',
+        cofs: 'dist/CoFS.min',
         buffer: 'bower_components/buffer/buffer',
         async: 'bower_components/async/lib/async',
         eventemitter2: 'bower_components/eventemitter2/lib/eventemitter2'
     }
 });
 
-require(['cofs/fs'], function (CoFS) {
+require(['cofs'], function (CoFS) {
 
     var $file = document.getElementById('ifile');
     var $cmdRead = document.getElementById('cmd-read');

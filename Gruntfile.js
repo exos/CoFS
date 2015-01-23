@@ -69,13 +69,32 @@ module.exports = function(grunt) {
                     name: 'node_modules/almond/almond',
                     include: ['cofs/fs'],
                     out: 'dist/<%= pkg.name %>.nodeps.js',
-                    optimize: 'none',
+                    optimize: 'uglify2',
                     wrap: {
                         startFile: 'extra/start.js',
                         endFile: 'extra/end.js'
                     }
                 }
-            }
+            },
+            min: {
+                options: {
+                    paths: {
+                        cofs: 'src',
+                        buffer: 'empty:',
+                        async: 'empty:',
+                        eventemitter2: 'empty:'
+                    },
+                    name: 'node_modules/almond/almond',
+                    include: ['cofs/fs'],
+                    out: 'dist/<%= pkg.name %>.min.js',
+                    optimize: 'uglify2',
+                    wrap: {
+                        startFile: 'extra/start.amd.js',
+                        endFile: 'extra/end.amd.js'
+                    }
+                }
+            },
+
         }
     });
 
