@@ -56,19 +56,24 @@ module.exports = function(grunt) {
             ]
         },    
         requirejs: {
-            compile: {
+            options:{
+                paths: {
+                    cofs: 'src',
+                    buffer: 'bower_components/buffer/buffer',
+                    async: 'bower_components/async/lib/async',
+                    "events-emitter": 'bower_components/events-emitter/src'
+                }
+            },
+            nodeps: {
                 options: {
-                    paths: {
-                        cofs: 'src',
-                        buffer: 'bower_components/buffer/buffer',
-                        async: 'bower_components/async/lib/async',
-                        underscore: 'bower_components/underscore/underscore'
-                    },
-                    name: 'cofs/fs',
-                    out: "dist/<%= pkg.name %>.js",
+                    name: 'node_modules/almond/almond',
+                    include: ['cofs/fs'],
+                    out: 'dist/<%= pkg.name %>.nodeps.js',
                     optimize: 'none',
-                    //optimize: "uglify",
-                    wrap: true
+                    wrap: {
+                        startFile: 'extra/start.js',
+                        endFile: 'extra/end.js'
+                    }
                 }
             }
         }
