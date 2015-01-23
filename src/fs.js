@@ -27,7 +27,7 @@ define([
         if (!requestFileSystem) requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem || null;
         if (!File) File = window.File || null;
 
-        if (!FileReader ||  !requestFileSystem || !File) 
+        if (!FileReader || !File) 
             throw new Error("Objects of file API does not exists!");
 
         this._eventsListeners = {}; 
@@ -100,6 +100,10 @@ define([
     CoFS.prototype.getFileSystem = function (options, callback) {
         
         var self = this;
+
+        if (!requestFileSystem) {
+            return callback(new Error("The browser has not requestFileSystem"));
+        }
 
         if (typeof options === 'function') {
             callback = options;
