@@ -1,77 +1,23 @@
-
-(function (root, factory) {
-
-    if (typeof define === 'function' && define.amd) {
-        define(['buffer', 'async', 'exports'], function (buffer, async, exports) {
-            return factory(root, exports, async, buffer);
-        });
-    } else if (typeof exports !== 'undefined') {
-        var buffer = require('buffer');
-        var async = require('async');
-        factory(root, exports, async, buffer);
-    } else {
-        root.CoFS = factory(root, {}, root.async, root.buffer);
-    }
-
-})(this, function (root, CoFS, async, buffer) {
+define([
+    'async',
+    'buffer',
+    './array2buffer',
+    './promise',
+    './readstream'
+], function (async, buffer, arrayBufferToBuffer, getDonePromise, ReadStream) {
     'use stricts';
 
-    var _CoFS = root.CoFS;
     var Buffer = buffer.Buffer;
 
     var FileReader = null;
     var requestFileSystem = null;
     var File = null;
-    var FileEntry = null;
 
-    var arrayBufferToBuffer = function (arr) {
-        var i,x,c, b, d;
-
-        d = new Int8Array(arr);
-        b = new Buffer(d);
-        c = arr.byteLength;
-
-        if (b.length || !c) {
-            d = null;
-            return b;
-        } else {
-
-            b = new Buffer(c);
-
-            for (i = 0; i < c; i++) {
-                x = d[i];
-                b.writeUInt8(x, i);
-            }
-
-            d = null;
-            return b;
-        }
-
-    };
-
-    var getDonePromise = function (listener) {
-
-        if (typeof listener !== 'function') {
-            throw new Error("Listener not defined");
-        }
-
-        return function () {
-            var args = Array.prototype.slice.call(arguments);
-            listener.apply({}, args);
-        };
-
-    };
-
-    CoFS = function () {
+    var CoFS = function () {
         this.initialize.apply(this, arguments);
     };
 
     CoFS.VERSION = '0.1.0';
-
-    CoFS.noConflict = function () {
-        root.CoFS = _CoFS;
-        return this;
-    };
 
     CoFS.prototype.initialize = function (options) {
  
@@ -141,7 +87,7 @@
 
         for (i=0; i<args.length;i++) {
             if (!listeners[i]) continue;
-            listeners[i].cb.apply(root, args);
+            listeners[i].cb.apply(this, args);
             if (listeners[i].once) {
                 listeners[i] = null;
             }
@@ -378,107 +324,8 @@
     };
 
     CoFS.prototype.createReadStream = function (file, options) {
-        var self = this;
-
-        options = options || {};
-        var blockSize = options.blockSize || 4096;
-        var start = options.start || 0;
-        var end = options.end !== undefined ? options.end : undefined;
-   
-        if (end <= start) {
-            throw new Error("Start byte has been bigger that end  byte");
-        }
-
-        var getFile = function (cb) {
-            if (file instanceof File || file instanceof Blob) {
-                return cb(undefined, file);
-            } else {
-                self.getFileEntry(file, function (err, fileEntry) {
-                    
-                    if (err) return cb(err);
-
-                    fileEntry.file(function (file) {
-                        return cb(undefined, file);
-                    });
-                });
-            }
-        };
-
-        var startStream = function (file, interface) {
-        
-            var parts = [];
-
-            if (typeof end === 'undefined')
-                end = file.size;
-
-            for (var i = start; i < end; i += blockSize) {
-
-                parts.push({
-                    start: i, 
-                    end: i+blockSize
-                });
-            }
-
-            async.eachSeries(
-                parts,
-                function (part, tcb) {
-
-                    var done = getDonePromise(function (err) {
-                        tcb(err || undefined);
-                    }); 
-
-                    self.readFilePart(
-                        file,
-                        part.start,
-                        part.end,
-                        function (err, data) {
-
-                            if (err) {
-                                done(err);
-                                return;
-                            }
-
-                            var cr = interface.partComplete(data, done);
-
-                            if (cr !== done)
-                                done();
-
-                        }
-                    );
-
-                }, function (err) {
-                    if (err) {
-                        return interface.error(err);
-                    }
-                    interface.readComplete();
-                }
-            );
-
-        };
-
-        var controlInterface = {
-            partComplete: function () {},
-            readComplete: function () {},
-            error: function (e) {
-                throw e;
-            },
-            start: function () {
-
-                var me = this;
-
-                getFile(function (err, file) {
-                    if (err) {
-                        return me.error(err);
-                    }
-
-                    startStream(file, me);
-
-                });
-            }
-        };
-
-        return controlInterface;
-
+        var readStream = new ReadStream(this, file, options);
+        return readStream;
     };
 
     return CoFS;
