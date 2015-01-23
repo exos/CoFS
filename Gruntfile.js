@@ -71,8 +71,8 @@ module.exports = function(grunt) {
                     out: 'dist/<%= pkg.name %>.nodeps.js',
                     optimize: 'uglify2',
                     wrap: {
-                        startFile: 'extra/start.js',
-                        endFile: 'extra/end.js'
+                        startFile: 'extra/start.nodeps.js',
+                        endFile: 'extra/end.nodeps.js'
                     }
                 }
             },
@@ -89,8 +89,8 @@ module.exports = function(grunt) {
                     out: 'dist/<%= pkg.name %>.min.js',
                     optimize: 'uglify2',
                     wrap: {
-                        startFile: 'extra/start.amd.js',
-                        endFile: 'extra/end.amd.js'
+                        startFile: 'extra/start.min.js',
+                        endFile: 'extra/end.min.js'
                     }
                 }
             },
