@@ -23,14 +23,24 @@
         <div id="result"></div>
         <hr>
         <input type="button" id="cmd-read" value="read">
-        <script type="text/javascript" src="../dist/CoFS.js"></script>
+        <input type="button" id="cmd-read-each-second" value="read-each-second">
+        <script type="text/javascript" src="../dist/CoFS.nodeps.js"></script>
         <script type="text/javascript">
 
             var $file = document.getElementById('ifile');
             var $cmdRead = document.getElementById('cmd-read');
+            var $cmdReadEachSecond = document.getElementById('cmd-read-each-second');
             var $result = document.getElementById('result');
 
             var fs = new CoFS();
+
+            var showData = function (data) {
+                var div = document.createElement('div');
+                div.className = 'block';
+                div.innerHTML = data.toString('hex').match(/.{1,2}/g).join(' ');
+                
+                $result.appendChild(div);
+            }
 
             $cmdRead.onclick = function (ev) {
                 var files = $file.files;
@@ -41,25 +51,46 @@
 
                 var stream = fs.createReadStream(files[0]);
 
-                stream.error = function (err) {
-                    alert("Error: " + err);
-                };
+                stream.on('error', function (err) {
+                    alert ("Error!! " + err)
+                });
 
-                stream.partComplete = function (data, done) {
-                    var div = document.createElement('div');
-                    div.className = 'block';
-                    div.innerHTML = data.toString('hex').match(/.{1,2}/g).join(' ');
-                    $result.appendChild(div);
-  /*                  setTimeout(function () {
-                        done();       
-                    }, 1000);
-*/
-//                    return done;
-                };
+                stream.on('data', function (data) {
+                    showData(data);
+                });
 
-                stream.readComplete = function (){
+                stream.on('finish', function () {
                     alert ("Raad complete!");
-                };
+                });
+
+                stream.start();
+
+            };
+
+            $cmdReadEachSecond.onclick = function (ev) {
+                var files = $file.files;
+
+                if (!files || !files.length) {
+                    return alert("No file selected");
+                }
+
+                var stream = fs.createReadStream(files[0]);
+
+                stream.on('error', function (err) {
+                    alert ("Error!! " + err)
+                });
+
+                stream.on('data', function (data) {
+                    stream.pause();
+                    showData(data);
+                    setTimeout(function(){
+                        stream.resume();
+                    }, 1000);
+                });
+
+                stream.on('finish', function () {
+                    alert ("Raad complete!");
+                });
 
                 stream.start();
 
