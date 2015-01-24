@@ -45,14 +45,20 @@
 
             $cmdSave.onclick = function (ev) {
 
-                var fsWriteable = new CoFS({
-                    fs: window.TEMPORARY     
-                });
-                
-                fsWriteable.writeFile($filename.value, $txt.value, 'utf-8', function (err) {
-                    if (err) {
-                        return alert("Error! " + err.toString());     
-                    }
+                var fsWriteable = new CoFS();
+    
+                fsWriteable.getEntryFile($filename, function (err, file) {
+
+                    if (err) return alert("Error: "+ err);
+
+
+                    fsWriteable.writeFile(file, $txt.value, 'utf-8', function (err) {
+                        if (err) {
+                            return alert("Error! " + err.toString());     
+                        }
+
+                        alert("Saved");
+                    });
                 });
 
             };
