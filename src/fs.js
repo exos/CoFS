@@ -3,8 +3,9 @@ define([
     'buffer',
     './array2buffer',
     './promise',
-    './readstream'
-], function (async, buffer, arrayBufferToBuffer, getDonePromise, ReadStream) {
+    './readstream',
+    './writestream'
+], function (async, buffer, arrayBufferToBuffer, getDonePromise, ReadStream, WriteStream) {
     'use stricts';
 
     var Buffer = buffer.Buffer;
@@ -327,9 +328,77 @@ define([
 
     };
 
+    CoFS.prototype.writeFilePart = function (fileName, start, data, encoding, callback) {
+        var self = this;
+
+        if (typeof start !== 'number') {
+            callback = encoding;
+            encoding = data;
+            data = start;
+            start = null;
+        }
+
+        if (Buffer.isBuffer(data)) {
+            callback = encoding;
+            encoding = undefined;
+        } else {
+            data = new Buffer(data, encoding);
+        }
+
+        this.getFileSystem(function (err, fs) {
+
+            if (err) return callback(err);
+
+            var op = {
+                create: false,
+                exclusive: true
+            };
+
+            self.getFileEntry(fileName, op, function (err, fileEntry) {
+
+                if (err)
+                    return callback(
+                        new Error("Error getting file access " + err.message));
+
+                fileEntry.createWriter(function(fileWriter) {
+              
+                    if (!start) start = fileWriter.length;
+
+                    fileWriter.onwriteend = function () {
+                        callback(null);
+                    };
+
+                    fileWriter.onerror = function(e) {
+                        callback(new Error(e.toString()));
+                    };
+
+                    var blob = new Blob(
+                        [data],
+                        {
+                            type: 'application/octet-stream'
+                        }
+                    );
+
+                    fileWriter.seek(start);
+                    fileWriter.write(blob);
+
+                }, function () {
+                    callback(new Error('Error writing ' + fileName));
+                }); 
+            });
+
+        });
+    
+    };
+
     CoFS.prototype.createReadStream = function (file, options) {
         var readStream = new ReadStream(this, file, options);
         return readStream;
+    };
+
+    CoFS.prototype.createWriteStream = function (file, options) {
+        var writeStream = new WriteStream(this, file, options);
+        return writeStream;
     };
 
     return CoFS;
