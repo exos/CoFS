@@ -39,6 +39,8 @@ define([
         this._file = file;
 
         this._start = options.start || 0;
+        this._ready = false;
+        this._starting = false;
         this._last = 0;
 
         this._paused = false;
@@ -48,12 +50,16 @@ define([
             self._fs.writeFilePart(self._file, data, done);
         }, 1);
 
+        this._writeQueue.pause();
+
         this._writeQueue.drain = function () {
             self.emit('drain');
         };
+
+        this._init();
      
     };
-    
+
     WriteStream.prototype._error = function (err) {
         var count = this.emit('error', err);
 
@@ -63,7 +69,30 @@ define([
 
     };
 
+    WriteStream._init = function () {
+        var self = this;
+       
+        if (this._starting) return;
+
+        this._starting = true;
+        
+        this._fs.writeFile(this._file, new Buffer(0), function (err) {
+            if (err) {
+                self._error(err);
+                return;
+            }
+
+            if (!self._paused) {
+                self.emit('ready');
+                self._writeQueue.resume();
+            }
+
+        });
+   
+    };
+
     WriteStream.prototype.write = function (data, encoding, callback) {
+        var self = this;
         
         if (!Buffer.isBuffer(data)) {
             data = new Buffer(data, encoding);
@@ -72,7 +101,9 @@ define([
             encoding = undefined;
         }
 
-        callback = callback || function () {};
+        callback = callback || function (err) {
+            self._error(err);
+        };
 
         this._writeQueue.push(data, callback);
 
