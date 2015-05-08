@@ -69,7 +69,7 @@ define([
 
     };
 
-    WriteStream._init = function () {
+    WriteStream.prototype._init = function () {
         var self = this;
        
         if (this._starting) return;
