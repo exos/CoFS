@@ -54,7 +54,7 @@ define([
 
     };
 
-    CoFS.VERSION = '0.4.5';
+    CoFS.VERSION = '0.5.0';
 
     /**
      * Log
