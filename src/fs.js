@@ -54,7 +54,7 @@ define([
 
     };
 
-    CoFS.VERSION = '0.5.1';
+    CoFS.VERSION = '0.5.2';
 
     /**
      * Log
@@ -407,7 +407,7 @@ define([
             options = {};
         }
 
-        if (!Buffer._isBuffer(data)) {
+        if (!Buffer.isBuffer(data)) {
             data = new Buffer(data, options.encode);
         }
 
