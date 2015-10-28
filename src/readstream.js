@@ -2,7 +2,7 @@ define([
     'async',
     'eventemitter2'
 ], function (async, EventsEmitter) {
-    'use stricts';
+    'use strict';
 
     var File, Blob;
 

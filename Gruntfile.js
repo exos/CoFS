@@ -1,14 +1,16 @@
 /*global module:false*/
+'use srtict';
 module.exports = function(grunt) {
 
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         meta: {
-            banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - ' +
+            banner: '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - '+
                        '<%= grunt.template.today("yyyy-mm-dd") %>' + '\n' +
                        '<%= pkg.homepage ? "* " + pkg.homepage : "" %>' + '\n' +
-                       ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author %>;' + '\n' +
+                       ' * Copyright (c) <%= grunt.template.today("yyyy") %> ' +
+                       ' <%= pkg.author %>;' + '\n' +
                        ' * License: (<%= pkg.license %>)' + '\n' +
                        ' */\n\n'
         },
@@ -32,27 +34,10 @@ module.exports = function(grunt) {
         jshint: {
             options: {
                 reporter: require('jshint-stylish'), 
-                curly: false,
-                eqeqeq: true,
-                immed: true,
-                latedef: true,
-                newcap: true,
-                noarg: true,
-                sub: true,
-                undef: true,
-                boss: true,
-                devel: true,
-                eqnull: true,
-                browser: true,
-                globals: {
-                  define: true,
-                  require: true,
-                  exports: true
-                }
+                jshintrc: true
             },
             files: [
-                'Gruntfile.js',
-                'src/*.js'
+                'src/**/*.js'
             ]
         },    
         requirejs: {

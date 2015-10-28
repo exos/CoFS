@@ -5,8 +5,9 @@ define([
     './promise',
     './readstream',
     './writestream'
-], function (async, buffer, arrayBufferToBuffer, getDonePromise, ReadStream, WriteStream) {
-    'use stricts';
+], function (async, buffer, arrayBufferToBuffer, getDonePromise, ReadStream,
+                                                                WriteStream) {
+    'use strict';
 
     var Buffer = buffer.Buffer;
 
@@ -18,14 +19,13 @@ define([
         this.initialize.apply(this, arguments);
     };
 
-    CoFS.VERSION = '0.4.3';
+    CoFS.VERSION = '0.4.5';
 
     CoFS.prototype.initialize = function (options) {
  
-        var self = this;
-
         if (!FileReader) FileReader = window.FileReader  || null;
-        if (!requestFileSystem) requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem || null;
+        if (!requestFileSystem) requestFileSystem = window.requestFileSystem ||
+                                        window.webkitRequestFileSystem || null;
         if (!File) File = window.File || null;
 
         if (!FileReader || !File) 
@@ -206,8 +206,9 @@ define([
         this._log("Creating filereader object", file);
         var reader = new FileReader();
 
-        reader.onloadend = function (evt) {
-            self._log("load end call! with large (relative): ", this.result.length );
+        reader.onloadend = function () {
+            self._log("load end call! with large (relative): ",
+                                                        this.result.length );
 
             if (!this.result) return null;
 
@@ -221,7 +222,7 @@ define([
             callback(new Error('Reading file'));
         };
 
-        reader.onabort = function (ev) {
+        reader.onabort = function () {
             self._log("Reading file Abort!!");
             callback(new Error('Reading abort')); 
         };
@@ -267,7 +268,7 @@ define([
             data = new Buffer(data, encoding);
         }
 
-        this.getFileSystem(function (err, fs) {
+        this.getFileSystem(function (err) {
 
             if (err) return callback(err);
 
@@ -328,7 +329,8 @@ define([
 
     };
 
-    CoFS.prototype.writeFilePart = function (fileName, start, data, encoding, callback) {
+    CoFS.prototype.writeFilePart = function (fileName, start, data, encoding,
+                                                                    callback) {
         var self = this;
 
         if (typeof start !== 'number') {
@@ -345,7 +347,7 @@ define([
             data = new Buffer(data, encoding);
         }
 
-        this.getFileSystem(function (err, fs) {
+        this.getFileSystem(function (err) {
 
             if (err) return callback(err);
 

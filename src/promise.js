@@ -1,6 +1,6 @@
 
 define(function () {
-    'use stricts';
+    'use strict';
 
     var getDonePromise = function (listener) {
 

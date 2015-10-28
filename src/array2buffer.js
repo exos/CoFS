@@ -2,7 +2,7 @@
 define([
     'buffer'
 ], function (buffer) {
-    'use stricts';
+    'use strict';
 
     var Buffer = buffer.Buffer;
 
