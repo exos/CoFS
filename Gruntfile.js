@@ -80,13 +80,29 @@ module.exports = function(grunt) {
                 }
             },
 
+        },
+
+        jsdoc: {
+            dist: {
+                src: [
+                    'README.md',
+                    'src/**/*.js'
+                ],
+                options: {
+                    destination: 'docs',
+                    //template: "node_modules/grunt-jsdoc/node_modules/ink-docstrap/template",
+                    //configure: "node_modules/grunt-jsdoc/node_modules/ink-docstrap/template/jsdoc.conf.json"
+                }
+            }
         }
+
     });
 
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-update-json');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
+    grunt.loadNpmTasks('grunt-jsdoc');
 
     grunt.registerTask('build', ['clean', 'update_json', 'requirejs']);
     grunt.registerTask('check', ['jshint']);

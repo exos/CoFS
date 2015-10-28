@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Home</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Home</h1>
+
+    
+
+
+
+    
+
+
+    <h3> </h3>
+
+
+
+
+
+
+
+
+
+
+    
+
+
+
+
+    <section>
+        <article><h1>CoFS</h1><p>Manage the HTML 5 File API <em>like a Sir</em>.</p>
+<h2>Ventages</h2><ul>
+<li>Callbacks like Node.js <em>(err, result)</em></li>
+<li>Use Buffer <em>(No encoding problem, binaries easy)</em></li>
+<li>AMD <em>(CommonJS, RequireJS, etc)</em></li>
+<li>Works with Cordova/Phonegap/ionic</li>
+</ul>
+<h2>Dependencies</h2><ul>
+<li><strong>Buffer</strong>: http://github.com/anodynos/node2web_buffer</li>
+<li><strong>Async.js</strong>: https://github.com/caolan/async</li>
+<li><strong>eventemitter2</strong> https://github.com/hij1nx/EventEmitter2</li>
+</ul>
+<h2>Instalation</h2><pre class="prettyprint source"><code>$ bower install cofs</code></pre><h2>Usage</h2><pre class="prettyprint source lang-JavaScript"><code>var fs = new CoFS();
+
+fs.readFile($('input[type=&quot;file&quot;]').files[0], function (err, data) {
+
+    if (err) {
+        // Display, ignore, kills, love, etc
+    }
+
+    console.log(&quot;Data of file:&quot; + data.toString('utf-8'));
+
+});</code></pre><h1>API</h1><h2>CoFS (Object)</h2><h3>new CoFS([options]);</h3><p>CoFS object is a Class, options parameter is optional:</p>
+<pre class="prettyprint source lang-Javascript"><code>var fs = new CoFS();</code></pre><p><strong>Options can be:</strong></p>
+<ul>
+<li><strong>fs</strong>: Type of FileSystem request, by Default is <em>PERSISTENT</em> (see <a href="https://developer.mozilla.org/en-US/docs/WebGuide/API/File_System/Introduction#The_File_System_API_can_use_different_storage_types">this page</a>) </li>
+<li><strong>logger</strong>: Callback for debug logger</li>
+</ul>
+<h3>CoFS.noConflict()</h3><p>Returns CoFS object and restore the var CoFS to back definition.</p>
+<h2>~CoFS (Instance)</h2><h3>~CoFs.on(eventName, callback)</h3><p>Subcribe callback to event.</p>
+<h3>~CoFS.once(eventname, callback)</h3><p>Like <em>on</em>, but the callback only runs once time.</p>
+<h3>~CoFS.getFileSystem([options], callback)</h3><p>Get a <em>FileSystem</em> instance.</p>
+<p><strong>Options can be:</strong></p>
+<ul>
+<li><strong>fs</strong>: Type of filesystem, by default is <em>PERSISTENT</em></li>
+</ul>
+<h3>~CoFS.getDirectory(dirName, [options], callback)</h3><p>Get <em><a href="https://developer.mozilla.org/en-US/docs/Web/API/DirectoryEntry">DirectoryEntry</a></em>, the options are passed to the
+natie API, see <a href="https://developer.mozilla.org/en-US/docs/Web/API/DirectoryEntry#getDirectory">this article</a>.</p>
+<h3>~CoFS.getFileEntry(fileName, [options], callback)</h3><p>Get a <em><a href="https://developer.mozilla.org/en-US/docs/Web/API/FileEntry">FileEntry</a></em> instance, from a path</p>
+<p>The options are pass to the native API, but accept a <strong>root</strong> param for define a directory, for example:</p>
+<pre class="prettyprint source lang-JavaScript"><code>var fs = new CoFS();
+
+fs.getDirectory('data', function (err, directory) {
+
+    // ...
+
+    fs.getFileEntry('myFile.dat', { root: directory }, function (err, file) {
+        //...
+    });
+});</code></pre><h3>~CoFS.readFromFileObject(file, callback)</h3><p>Read a file from a native <em><a href="https://developer.mozilla.org/en-US/docs/Web/API/File">File</a></em> instance.</p>
+<h3>~CoFS.readFromFileEntry(fileEntry, callback)</h3><p>Read a file from a native <em>FileEntry</em> object.</p>
+<h3>~CoFS.readFile(file, callback)</h3><p>Identify the object passed and read a file, the first param cab be a File object, FileEntry object, or a String with the file path.</p>
+<h3>~CoFS.writeFile(fileName, data, [encoding], callback)</h3><p>Write a file with the content of data, if data is a <em>Buffer</em> object, encoding is not expected, is data is a String, encoding is needed.</p>
+<h1>Development environment</h1><p>You needs:</p>
+<ul>
+<li><a href="http://nodejs.org/">Node.js</a> for tools</li>
+<li><a href="http://gruntjs.com/">Grunt</a> for tasks</li>
+<li><a href="http://bower.io/">Bower</a> for install dependencies</li>
+</ul>
+<h2>First clone the repo (this or your fork)</h2><pre class="prettyprint source"><code>$ git clone https://github.com/exos/CoFS.git</code></pre><h2>Install the cli-tools:</h2><pre class="prettyprint source"><code>$ sudo npm install -g bower grunt-cli </code></pre><h2>Install dependencies</h2><pre class="prettyprint source"><code>$ npm install
+$ bower install</code></pre><h2>Check if you can build, etc:</h2><pre class="prettyprint source"><code>$ grunt</code></pre><h2>Grunt tasks</h2><ul>
+<li><strong>check</strong>: Check the code with <a href="http://jshint.com/">JSHint</a></li>
+<li><strong>build</strong>: Build the dist CoFS.js file minified and ready to use </li>
+</ul>
+<h1>Contrib</h1><p>You can contrib with:</p>
+<ul>
+<li>Use and testing it</li>
+<li>Reporting errors, ideas on <a href="https://github.com/exos/cofs/issues">Issues section</a></li>
+<li>Add or fixing code, fork this repo and send Pull Requests :)</li>
+<li>Fix documentation</li>
+<li>Donate :P BTC <a href="bitcoin:14NvJxpQsxs4EK8MTq2rubTDwuy54uCesu?label=CoFS%20dontaions&amp;message=Donations%20for%20CoFS%20library.%20By%20Exos%20%3Coscar%40gentisoft.com%3E">14NvJxpQsxs4EK8MTq2rubTDwuy54uCesu</a></li>
+</ul></article>
+    </section>
+
+
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="CoFS.html">CoFS</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.3</a> on Wed Oct 28 2015 18:09:25 GMT-0300 (ART)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

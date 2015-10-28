@@ -2,19 +2,18 @@
 
 Manage the HTML 5 File API *like a Sir*.
 
-    Atention: this is a alpha package.
-
 ## Ventages
 
 * Callbacks like Node.js *(err, result)*
 * Use Buffer *(No encoding problem, binaries easy)*
 * AMD *(CommonJS, RequireJS, etc)*
-* Works with Cordova/Phonegap
+* Works with Cordova/Phonegap/ionic
 
 ## Dependencies
 
 * **Buffer**: http://github.com/anodynos/node2web_buffer
 * **Async.js**: https://github.com/caolan/async
+* **eventemitter2** https://github.com/hij1nx/EventEmitter2
 
 ## Instalation
 
