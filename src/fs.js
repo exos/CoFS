@@ -54,7 +54,7 @@ define([
 
     };
 
-    CoFS.VERSION = '0.5.0';
+    CoFS.VERSION = '0.5.1';
 
     /**
      * Log
@@ -307,6 +307,7 @@ define([
 
         this._log("Creating filereader object", file);
         var reader = new FileReader();
+        options = options || {};
 
         reader.onloadend = function () {
             self._log("load end call! with large (relative): ",
