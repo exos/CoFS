@@ -54,7 +54,7 @@ define([
 
     };
 
-    CoFS.VERSION = '0.5.3';
+    CoFS.VERSION = '0.5.4';
 
     /**
      * Log
@@ -274,7 +274,7 @@ define([
                 return callback(err);
             }
 
-            root = options.root || this._options.root || fs.root;
+            root = options.root || self._options.root || fs.root;
 
             root.getFile(
                 fileName,
