@@ -54,7 +54,7 @@ define([
 
     };
 
-    CoFS.VERSION = '0.5.2';
+    CoFS.VERSION = '0.5.3';
 
     /**
      * Log
@@ -163,9 +163,11 @@ define([
 
         if (typeof options === 'function') {
             callback = options;
-            options = {};
+            options = undefined;
         }
         
+        options = options || {};
+
         this._log("Open FileSystem", options);
 
         if (this._fs && !options.force) {
@@ -254,9 +256,10 @@ define([
 
         if (typeof options === 'function') {
             callback = options;
-            options = {};
+            options = undefined;
         }
 
+        options = options || {};
 
         this._log ("Getting FileEntry for", fileName, options);
 
@@ -354,6 +357,8 @@ define([
             options = undefined;
         }
 
+        options = options || {};
+
         fileEntry.file(function (file) {
             self.readFromFileObject(file, options, callback);
         });
@@ -404,12 +409,14 @@ define([
 
         if (typeof options === 'function') {
             callback = options;
-            options = {};
+            options = undefined;
         }
 
         if (!Buffer.isBuffer(data)) {
             data = new Buffer(data, options.encode);
         }
+
+        options = options || {};
 
         fileEntry.createWriter(function(fileWriter) {
 
@@ -449,8 +456,10 @@ define([
 
         if (typeof options === 'function') {
             callback = options;
-            options = {};
+            options = undefined;
         }
+
+        options = options || {};
 
         options.create = true;
         options.exclusive = true;
