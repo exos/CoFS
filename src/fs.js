@@ -54,7 +54,7 @@ define([
 
     };
 
-    CoFS.VERSION = '0.5.4';
+    CoFS.VERSION = '0.5.5';
 
     /**
      * Log
@@ -401,7 +401,8 @@ define([
      * @param {string} [options.encode]     - In case of data has a string, this
      *                                        option is required, and define the
      *                                        encoding of data 
-     * @param {function} callback           - Callback
+     * @param {function} callback           - Callback, this return the
+     * FileEntry of writer file
      */
 
     CoFS.prototype.writeFileObject = function (fileEntry, data, options,
@@ -421,7 +422,7 @@ define([
         fileEntry.createWriter(function(fileWriter) {
 
             fileWriter.onwriteend = function () {
-                callback(null);
+                callback(null, fileEntry);
             };
 
             fileWriter.onerror = function(e) {
